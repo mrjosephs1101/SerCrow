@@ -1,5 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 import type { SearchResponse, SearchSuggestion } from '@shared/schema';
 
 export function useSearch(query: string, filter: string = 'all', page: number = 1) {
@@ -11,15 +10,24 @@ export function useSearch(query: string, filter: string = 'all', page: number = 
         filter,
         page: page.toString()
       });
-      const response = await fetch(`/api/search?${params}`);
+
+      const response = await fetch(`/api/search?${params.toString()}`);
       if (!response.ok) {
-        throw new Error(`Search failed: ${response.statusText}`);
+        const errText = await response.text();
+        throw new Error(`Search failed: ${response.status} - ${errText}`);
       }
-      return response.json();
+
+      const data = await response.json();
+      if (!data || !Array.isArray(data.results)) {
+        throw new Error("Invalid response from search API.");
+      }
+
+      return data;
     },
-    enabled: query.length > 0,
+    enabled: query.trim().length > 0,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
+    retry: 1,
   });
 }
 
@@ -31,23 +39,44 @@ export function useSearchSuggestions(query: string) {
       if (!response.ok) {
         throw new Error(`Suggestions failed: ${response.statusText}`);
       }
-      return response.json();
+
+      const data = await response.json();
+      return data;
     },
-    enabled: query.length > 1,
+    enabled: query.trim().length > 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
 }
 
 export function usePopularSearches() {
-  return useQuery({
+  return useQuery<{ searches: { id: string; query: string }[] }>({
     queryKey: ['/api/popular-searches'],
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    queryFn: async () => {
+      const response = await fetch(`/api/popular-searches`);
+      if (!response.ok) {
+        throw new Error(`Popular searches failed: ${response.statusText}`);
+      }
+
+      return response.json();
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 1,
   });
 }
 
 export function useRecentSearches() {
-  return useQuery({
+  return useQuery<{ searches: { id: string; query: string }[] }>({
     queryKey: ['/api/recent-searches'],
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    queryFn: async () => {
+      const response = await fetch(`/api/recent-searches`);
+      if (!response.ok) {
+        throw new Error(`Recent searches failed: ${response.statusText}`);
+      }
+
+      return response.json();
+    },
+    staleTime: 2 * 60 * 1000,
+    retry: 1,
   });
 }
