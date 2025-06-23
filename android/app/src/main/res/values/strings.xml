@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SerCrow</string>
+    <string name="title_activity_main">SerCrow - Search Engine</string>
+    <string name="package_name">com.serqo.searchengine</string>
+    <string name="custom_url_scheme">com.serqo.searchengine</string>
+</resources>
