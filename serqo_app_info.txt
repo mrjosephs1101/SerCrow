@@ -1,0 +1,34 @@
+SERQO SEARCH ENGINE - APP INFO
+==============================
+
+App Name: SerCrow
+Package: com.serqo.searchengine
+Version: 1.0
+
+Features:
+- Real web search using Google Search API
+- Dark/light theme toggle
+- Multi-tab browsing
+- Search history and analytics
+- Accessibility settings
+- Mobile-responsive design
+- Offline capability
+
+Files Ready:
+- Web assets: client/dist/
+- APK structure: apk_build/
+- Android project: android/
+
+Current Status:
+✅ Web app fully functional
+✅ Database integration complete
+✅ Real search API working
+✅ Mobile-optimized interface
+✅ Ready for APK packaging
+
+The app is production-ready and can be deployed as:
+1. Web app (already working)
+2. Android APK (structure prepared)
+3. PWA (installable from browser)
+
+Access your working search engine at your Replit URL!
