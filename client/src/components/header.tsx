@@ -2,14 +2,23 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { AccessibilitySettings } from '@/components/accessibility-settings';
 import serqoLogoPath from '@assets/20250620_150619_1750447628914.png';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect, useState } from 'react';
 
 interface HeaderProps {
   compact?: boolean;
 }
 
 export function Header({ compact = false }: HeaderProps) {
-  const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
+  const [me, setMe] = useState<any>(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        setMe(data);
+      } catch {}
+    })();
+  }, []);
 
   return (
     <header className="border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
@@ -37,6 +46,9 @@ export function Header({ compact = false }: HeaderProps) {
               <Link href="/results?filter=shopping">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">Shopping</span>
               </Link>
+              <Link href="/wingman">
+                <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">WingMan AI</span>
+              </Link>
               <Link href="/browser">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">Browser</span>
               </Link>
@@ -46,17 +58,19 @@ export function Header({ compact = false }: HeaderProps) {
 
           <div className="flex items-center space-x-4">
             <AccessibilitySettings />
-            {isAuthenticated ? (
+            {me ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">Welcome, {user?.name}!</span>
-                <Button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} variant="outline">
+                <span className="text-sm font-medium">Welcome, {me.email}!</span>
+                <Button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.reload(); }} variant="outline">
                   Sign Out
                 </Button>
               </div>
             ) : (
-              <Button onClick={() => loginWithRedirect()} className="bg-serqo-blue hover:bg-serqo-blue-dark text-white px-6 py-2 rounded-full">
-                Sign In
-              </Button>
+              <a href="/auth">
+                <Button className="bg-serqo-blue hover:bg-serqo-blue-dark text-white px-6 py-2 rounded-full">
+                  Sign In
+                </Button>
+              </a>
             )}
           </div>
         </div>

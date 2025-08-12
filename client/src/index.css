@@ -124,4 +124,98 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  
+  /* ChatGPT-like styling for wingman */
+  .wingman-message {
+    transition: all 0.2s ease;
+  }
+  
+  .wingman-message:hover {
+    background-color: hsl(var(--muted) / 0.3);
+  }
+  
+  .wingman-input-area {
+    background: linear-gradient(to top, hsl(var(--background)), hsl(var(--background) / 0.95));
+  }
+  
+  .wingman-sidebar {
+    background: linear-gradient(to bottom, hsl(var(--muted) / 0.3), hsl(var(--muted) / 0.1));
+  }
+  
+  .wingman-chat-bubble {
+    animation: fadeInUp 0.3s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .wingman-typing {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Enhanced ChatGPT-like animations */
+  .wingman-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth sidebar transitions */
+  .wingman-sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Message bubble hover effects */
+  .wingman-message-bubble {
+    transition: all 0.2s ease;
+  }
+
+  .wingman-message-bubble:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--muted) / 0.4);
+  }
+
+  /* Input focus effects */
+  .wingman-input:focus {
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+    border-color: hsl(var(--primary));
+  }
+
+  /* Suggestion cards */
+  .wingman-suggestion-card {
+    transition: all 0.2s ease;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .wingman-suggestion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsl(var(--muted) / 0.5);
+    border-color: hsl(var(--primary) / 0.3);
+  }
 }

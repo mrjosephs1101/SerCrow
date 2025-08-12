@@ -1,9 +1,13 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { recordSearchQuery, getRecentSearchesRedis, getPopularSearchesRedis } from "./redis";
 import { insertSearchQuerySchema, type SearchResponse, type SearchResult, type SearchSuggestion } from "@shared/schema";
 import { lru } from "tiny-lru";
 import { wingman } from "./wingman";
+import crypto from "crypto";
+import passport from "passport";
+import { Strategy as GoogleStrategy, Profile as GoogleProfile } from "passport-google-oauth20";
 
 const cache = lru(100, 60000); // Cache up to 100 items for 60 seconds
 
@@ -233,7 +237,155 @@ function isSearchResultArray(value: any): value is SearchResult[] {
   );
 }
 
+function hashPassword(password: string, salt?: string): { hash: string; salt: string } {
+  const actualSalt = salt || crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, actualSalt, 64).toString('hex');
+  return { hash, salt: actualSalt };
+}
+
+function verifyPassword(password: string, hash: string, salt: string): boolean {
+  const { hash: verifyHash } = hashPassword(password, salt);
+  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(verifyHash, 'hex'));
+}
+
+let googleAuthConfigured = false;
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure Google OAuth (inside function to ensure dotenv has loaded)
+  if (!googleAuthConfigured) {
+    const clientID = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const callbackURL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+
+    if (clientID && clientSecret) {
+      passport.use(new GoogleStrategy({ clientID, clientSecret, callbackURL }, async (_accessToken, _refreshToken, profile: GoogleProfile, done) => {
+        try {
+          const email = (profile.emails && profile.emails[0]?.value) || undefined;
+          if (!email) return done(new Error('No email returned by Google'));
+          // Find or create user by email
+          let user = await storage.getUserByUsername(email.toLowerCase());
+          if (!user) {
+            user = await storage.createUser({ username: email.toLowerCase(), password: 'oauth:google' });
+          }
+          return done(null, { id: user.id, email: user.username });
+        } catch (e) {
+          return done(e as any);
+        }
+      }));
+      googleAuthConfigured = true;
+      console.log('🔐 Google OAuth configured');
+    } else {
+      console.log('ℹ️ Google OAuth not configured (missing GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET)');
+    }
+  }
+  // Auth: get current user
+  app.get("/api/auth/me", async (req: Request, res: Response) => {
+    const anyReq = req as any;
+    if (anyReq.session?.userId) {
+      try {
+        const user = await storage.getUser(Number(anyReq.session.userId));
+        if (user) {
+          return res.json({ id: user.id, email: user.username });
+        }
+      } catch {}
+    }
+    res.json(null);
+  });
+
+  // Auth: register
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body || {};
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+      }
+      const existing = await storage.getUserByUsername(String(email).toLowerCase());
+      if (existing) {
+        return res.status(409).json({ error: 'Account already exists' });
+      }
+      const { hash, salt } = hashPassword(password);
+      const user = await storage.createUser({ username: String(email).toLowerCase(), password: `${salt}:${hash}` });
+      const anyReq = req as any;
+      anyReq.session.userId = user.id;
+      res.json({ id: user.id, email: user.username });
+    } catch (e) {
+      console.error('Register error:', e);
+      res.status(500).json({ error: 'Registration failed' });
+    }
+  });
+
+  // Auth: Google OAuth endpoints
+  app.get("/api/auth/google", (req: Request, res: Response, next) => {
+    if (!googleAuthConfigured) return res.status(501).json({ error: 'Google OAuth not configured' });
+    return (passport.authenticate('google', { scope: ['profile', 'email'], session: false }) as any)(req, res, next);
+  });
+
+  app.get("/api/auth/google/callback", (req: Request, res: Response, next) => {
+    if (!googleAuthConfigured) return res.redirect('/auth');
+    (passport.authenticate('google', { session: false }) as any)(req, res, async () => {
+      try {
+        const anyReq = req as any;
+        const user = (anyReq.user as any) || null;
+        if (user && user.id) {
+          anyReq.session.userId = user.id;
+          return res.redirect('/');
+        }
+        return res.redirect('/auth');
+      } catch (e) {
+        return res.redirect('/auth');
+      }
+    });
+  });
+
+  // Auth: login
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body || {};
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+      }
+      const user = await storage.getUserByUsername(String(email).toLowerCase());
+      if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+      const [salt, hash] = String(user.password).split(':');
+      if (!salt || !hash) return res.status(401).json({ error: 'Invalid credentials' });
+      if (!verifyPassword(password, hash, salt)) return res.status(401).json({ error: 'Invalid credentials' });
+      const anyReq = req as any;
+      anyReq.session.userId = user.id;
+      res.json({ id: user.id, email: user.username });
+    } catch (e) {
+      console.error('Login error:', e);
+      res.status(500).json({ error: 'Login failed' });
+    }
+  });
+
+  // Auth: logout
+  app.post("/api/auth/logout", async (req: Request, res: Response) => {
+    const anyReq = req as any;
+    if (anyReq.session) {
+      anyReq.session.destroy(() => {});
+    }
+    res.json({ ok: true });
+  });
+
+  // Preferences: store in session for now
+  app.post("/api/user/preferences", async (req: Request, res: Response) => {
+    try {
+      const anyReq = req as any;
+      anyReq.session.preferences = req.body || {};
+      anyReq.session.setupCompleted = true;
+      res.json({ ok: true });
+    } catch (e) {
+      res.status(500).json({ ok: false });
+    }
+  });
+
+  // Require-setup flag
+  app.get("/api/auth/require-setup", async (req: Request, res: Response) => {
+    const anyReq = req as any;
+    const needs = Boolean(anyReq.session?.userId) && !Boolean(anyReq.session?.setupCompleted);
+    res.json({ requireSetup: needs });
+  });
+
   // Enhanced search endpoint with full Google API integration
   app.get("/api/search", async (req: Request, res: Response) => {
     try {
@@ -316,6 +468,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error("Failed to log search query:", error);
       }
+      // Also push lightweight record to Redis (non-blocking)
+      try {
+        void recordSearchQuery(query);
+      } catch (e) {
+        // ignore redis errors
+      }
 
       const response: SearchResponse = {
         results: filteredResults,
@@ -378,22 +536,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Popular searches endpoint
+  // Popular searches endpoint (Redis first, DB fallback)
   app.get("/api/popular-searches", async (req: Request, res: Response) => {
     try {
+      const redisPopular = await getPopularSearchesRedis(10);
+      if (redisPopular && redisPopular.length > 0) {
+        return res.json({ searches: redisPopular });
+      }
       const popularSearches = await storage.getPopularSearches(10);
-      res.json({ searches: popularSearches });
+      res.json({ searches: popularSearches.map((s) => ({ id: s.id, query: s.query })) });
     } catch (error) {
       console.error("Popular searches error:", error);
       res.status(500).json({ error: "Internal server error fetching popular searches" });
     }
   });
 
-  // Recent searches endpoint
+  // Recent searches endpoint (Redis first, DB fallback)
   app.get("/api/recent-searches", async (req: Request, res: Response) => {
     try {
+      const redisRecent = await getRecentSearchesRedis(10);
+      if (redisRecent && redisRecent.length > 0) {
+        return res.json({ searches: redisRecent });
+      }
       const recentSearches = await storage.getRecentSearches(10);
-      res.json({ searches: recentSearches });
+      res.json({ searches: recentSearches.map((s) => ({ id: s.id, query: s.query })) });
     } catch (error) {
       console.error("Recent searches error:", error);
       res.status(500).json({ error: "Internal server error fetching recent searches" });
@@ -539,6 +705,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tags: [],
         sentiment: 'neutral'
       });
+    }
+  });
+
+  // WingMan AI: Image generation
+  app.post("/api/wingman/image", async (req: Request, res: Response) => {
+    try {
+      const { prompt, size } = req.body || {};
+      if (!prompt || typeof prompt !== 'string') {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
+      const result = await wingman.generateImage(prompt, typeof size === 'string' ? size : '1024x1024');
+      res.json(result);
+    } catch (error) {
+      console.error('WingMan image generation error:', error);
+      res.status(500).json({ images: [], provider: 'OpenRouter' });
     }
   });
 

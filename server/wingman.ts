@@ -6,11 +6,15 @@ export class WingMan {
   private defaultModel: string;
   private baseUrl: string;
   private isAvailable: boolean = false;
+  private hfApiKey: string;
+  private hfImageModel: string;
 
   constructor() {
     this.apiKey = process.env.OPENROUTER_API_KEY || '';
     this.defaultModel = process.env.OPENROUTER_MODEL || 'openai/gpt-4-turbo-preview';
     this.baseUrl = 'https://openrouter.ai/api/v1';
+    this.hfApiKey = process.env.HUGGINGFACE_API_KEY || '';
+    this.hfImageModel = process.env.HUGGINGFACE_IMAGE_MODEL || 'runwayml/stable-diffusion-v1-5';
     this.checkAvailability();
   }
 
@@ -43,11 +47,12 @@ export class WingMan {
     }
   }
 
-  public getStatus(): { available: boolean; model: string; provider: string } {
+  public getStatus(): { available: boolean; model: string; provider: string; imageModel?: string } {
     return {
       available: this.isAvailable,
       model: this.defaultModel,
-      provider: 'OpenRouter'
+      provider: 'OpenRouter',
+      imageModel: this.hfImageModel,
     };
   }
 
@@ -84,7 +89,7 @@ export class WingMan {
 
   // Smart search query enhancement and suggestions
   public async enhanceSearchQuery(query: string): Promise<{
-    original: query;
+    original: string;
     enhanced: string;
     suggestions: string[];
     intent: string;
@@ -308,6 +313,59 @@ Respond with just a JSON array of strings:
     } catch (error) {
       console.error('WingMan smart suggestions error:', error);
       return [];
+    }
+  }
+
+  // Image generation via Hugging Face Inference API
+  public async generateImage(prompt: string, size: string = '1024x1024'): Promise<{ images: string[]; provider: string; model: string }> {
+    if (!this.hfApiKey) {
+      console.warn('Hugging Face API key not configured. Image generation disabled.');
+      return { images: [], provider: 'HuggingFace', model: this.hfImageModel };
+    }
+
+    try {
+      const url = `https://api-inference.huggingface.co/models/${this.hfImageModel}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.hfApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // Many text-to-image models accept plain string in "inputs"
+          inputs: prompt,
+          options: { wait_for_model: true }
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`HF image API error ${response.status}: ${errText}`);
+      }
+
+      // HF returns binary image (image/png or image/jpeg) for many models. If JSON, handle accordingly.
+      const contentType = response.headers.get('content-type') || '';
+      const images: string[] = [];
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        // Some models return { images: [base64,...] } or similar; try to normalize
+        if (Array.isArray(data?.images)) {
+          for (const item of data.images) {
+            if (typeof item === 'string') {
+              images.push(item.startsWith('data:') ? item : `data:image/png;base64,${item}`);
+            }
+          }
+        }
+      } else {
+        const buffer = await response.arrayBuffer();
+        const b64 = Buffer.from(buffer).toString('base64');
+        images.push(`data:image/png;base64,${b64}`);
+      }
+
+      return { images, provider: 'HuggingFace', model: this.hfImageModel };
+    } catch (error) {
+      console.error('WingMan image generation error:', error);
+      return { images: [], provider: 'HuggingFace', model: this.hfImageModel };
     }
   }
 

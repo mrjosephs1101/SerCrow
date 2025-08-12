@@ -93,9 +93,9 @@ export function WingManChat({ query, results, onQueryChange, onSearch }: WingMan
 
       // Prepare the context payload
       const payload = {
-        conversation: conversationHistory,
-        currentQuery: query,
-        searchResults: results?.slice(0, 5) // Include top 5 results for context
+        message: userMessage.content,
+        conversationHistory,
+        searchResults: results?.slice(0, 5)
       };
 
       // Send to the chat endpoint (we'll need to create this)
@@ -114,7 +114,7 @@ export function WingManChat({ query, results, onQueryChange, onSearch }: WingMan
           return [...withoutLoading, {
             id: Date.now().toString() + '_ai',
             role: 'assistant',
-            content: aiResponse.response || 'I apologize, but I couldn\'t generate a response at this time.',
+            content: aiResponse.answer || 'I apologize, but I couldn\'t generate a response at this time.',
             timestamp: new Date()
           }];
         });
@@ -144,7 +144,7 @@ export function WingManChat({ query, results, onQueryChange, onSearch }: WingMan
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -240,7 +240,7 @@ export function WingManChat({ query, results, onQueryChange, onSearch }: WingMan
                 placeholder="Ask WingMan anything about your search..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 className="min-h-[60px] max-h-32 resize-none pr-12"
                 disabled={isLoading}
               />

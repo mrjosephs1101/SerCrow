@@ -16,6 +16,7 @@ export default function Search() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { data: popularSearchesData } = usePopularSearches();
   const popularSearches = popularSearchesData?.searches || [];
+  const [me, setMe] = useState<any>(null);
 
 const handleSearch = (query: string) => {
     if (query.trim()) {
@@ -60,6 +61,17 @@ const handleSearch = (query: string) => {
   // Set page title
   useEffect(() => {
     document.title = 'SerCrow - The Best Search Engine Ever';
+  }, []);
+
+  // Fetch auth session
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        setMe(data);
+      } catch {}
+    })();
   }, []);
 
   return (
@@ -110,6 +122,32 @@ const handleSearch = (query: string) => {
             >
               Advanced Search
             </Button>
+                      </div>
+
+          {/* Auth Section */}
+          <div className="flex justify-center mb-6 sm:mb-8">
+            {me ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Signed in as {me.email}</span>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    window.location.reload();
+                  }}
+                  className="px-4 py-2 text-xs sm:text-sm"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={() => { window.location.href = '/auth'; }}
+                className="bg-serqo-blue hover:bg-serqo-blue-dark text-white px-6 py-2 rounded-full text-xs sm:text-sm"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Advanced Search Options */}

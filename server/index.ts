@@ -3,13 +3,40 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
 import dotenv from "dotenv";
+import session from "express-session";
+import passport from "passport";
+// @ts-ignore - memorystore has no types
+import MemoryStoreFactory from "memorystore";
 
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1); // trust first proxy for dev tunnels
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+const MemoryStore = MemoryStoreFactory(session);
+const SESSION_SECRET = process.env.SESSION_SECRET || 'sercrow-dev-secret';
+
+app.use(
+  session({
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: false, // set true behind HTTPS reverse proxy with proper trust proxy
+      httpOnly: true,
+      sameSite: 'lax',
+    },
+    name: 'sercrow.sid',
+    resave: false,
+    saveUninitialized: false,
+    secret: SESSION_SECRET,
+    store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 }),
+  })
+);
+
+// Initialize Passport (used for Google OAuth)
+app.use(passport.initialize());
 
 // Add request logging middleware
 app.use((req, res, next) => {

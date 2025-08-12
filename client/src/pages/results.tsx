@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, useSearch as useWouterSearch } from 'wouter';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { SearchResults } from '@/components/search-results';
@@ -14,9 +14,10 @@ import { WingManAssistant } from '@/components/wingman-assistant';
 
 export default function Results() {
   const [location, setLocation] = useLocation();
+  const searchStr = useWouterSearch();
   
-  // Parse URL parameters
-  const params = new URLSearchParams(location.split('?')[1] || '');
+  // Parse URL parameters in a router-aware way to ensure sync
+  const params = new URLSearchParams(searchStr || '');
   const initialQuery = params.get('q') || '';
   const initialFilter = params.get('filter') || 'all';
   const initialPage = parseInt(params.get('page') || '1', 10);
@@ -34,7 +35,7 @@ export default function Results() {
 
   // Update state when location changes
   useEffect(() => {
-    const params = new URLSearchParams(location.split('?')[1] || '');
+    const params = new URLSearchParams(searchStr || '');
     const newQuery = params.get('q') || '';
     const newFilter = params.get('filter') || 'all';
     const newPage = parseInt(params.get('page') || '1', 10);
@@ -48,7 +49,7 @@ export default function Results() {
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
-  }, [location]);
+  }, [location, searchStr]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -60,16 +61,21 @@ export default function Results() {
 
 const handleSearch = (query: string) => {
     if (query.trim()) {
-      const searchId = query.trim().toLowerCase().replace(/\s+/g, '-') + '-all';
-      setLocation(`/sq/${searchId}?q=${encodeURIComponent(query.trim())}`);
+      const q = query.trim();
+      const newParams = new URLSearchParams();
+      newParams.set('q', q);
+      if (filter && filter !== 'all') newParams.set('filter', filter);
+      newParams.set('page', '1');
+      const searchId = `${q.toLowerCase().replace(/\s+/g, '-')}-${filter}`;
+      setLocation(`/sq/${searchId}?${newParams.toString()}`);
     }
   };
 
   const handleFilterChange = (newFilter: string) => {
     const newParams = new URLSearchParams();
     newParams.set('q', searchQuery);
-    newParams.set('filter', newFilter);
-    
+    if (newFilter && newFilter !== 'all') newParams.set('filter', newFilter);
+    newParams.set('page', '1');
     const searchId = `${searchQuery.toLowerCase().replace(/\s+/g, '-')}-${newFilter}`;
     setLocation(`/sq/${searchId}?${newParams.toString()}`);
   };

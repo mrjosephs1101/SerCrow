@@ -12,6 +12,8 @@ import Results from "@/pages/results";
 import NotFound from "@/pages/not-found";
 import WingManPage from "@/pages/wingman"; // 👈 Add this
 import Browser from "@/pages/browser";
+import AuthPage from "@/pages/auth";
+import SetupPage from "@/pages/setup";
 
 function Router() {
   return (
@@ -21,6 +23,8 @@ function Router() {
       <Route path="/sq/:searchId" component={Results} />
       <Route path="/wingman" component={WingManPage} /> {/* 👈 Add route */}
       <Route path="/browser" component={Browser} />
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/setup" component={SetupPage} />
       <Route component={NotFound} />
     </Switch>
   );
