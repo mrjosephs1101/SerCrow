@@ -23,6 +23,7 @@ const getPlugins = async (): Promise<PluginOption[]> => {
 // Export full config with async plugins
 export default defineConfig(async () => ({
   plugins: await getPlugins(),
+  base: "./",
 
   resolve: {
     alias: {
