@@ -1,0 +1,5 @@
+# Handle API requests - replace with your actual Cloudflare Worker URL
+/api/* https://sercrow-api.your-subdomain.workers.dev/api/:splat 200
+
+# Handle client-side routing - all other requests go to index.html
+/* /index.html 200
