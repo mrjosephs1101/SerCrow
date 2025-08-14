@@ -23,7 +23,7 @@ const getPlugins = async (): Promise<PluginOption[]> => {
 // Export full config with async plugins
 export default defineConfig(async () => ({
   plugins: await getPlugins(),
-  base: "./",
+  base: process.env.NODE_ENV === 'production' ? '/SerCrow/' : './',
 
   resolve: {
     alias: {
@@ -38,6 +38,14 @@ export default defineConfig(async () => ({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-select'],
+        },
+      },
+    },
   },
 
   server: {
@@ -46,7 +54,11 @@ export default defineConfig(async () => ({
       deny: ["**/.*"],
     },
     hmr: {
-      overlay: false, // Disables Vite’s default error overlay
+      overlay: false, // Disables Vite's default error overlay
     },
+  },
+
+  define: {
+    __VITE_API_BASE_URL__: JSON.stringify(process.env.VITE_API_BASE_URL || ''),
   },
 }));

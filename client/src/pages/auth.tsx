@@ -6,9 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Google, Github, Microsoft } from 'react-icons/fa';
-
-// Base URL for API calls; set VITE_API_BASE_URL to your server origin for production
-const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || '';
+import { API_BASE, getFeatureFlags } from '@/config/api';
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
