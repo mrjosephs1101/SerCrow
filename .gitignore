@@ -59,6 +59,7 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
+.env
 
 # Electron
 out/
