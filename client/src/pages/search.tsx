@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { usePopularSearches } from '@/hooks/use-search';
 import serqoLogoPath from "@assets/20250620_150619_1750447628914.png";
 import { AdvancedSearch } from '@/components/advanced-search';
-import { API_BASE, getFeatureFlags } from '@/config/api';
 
 export default function Search() {
   const [, setLocation] = useLocation();
