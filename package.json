@@ -91,7 +91,8 @@
     "ws": "^8.18.0",
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0",
-    "zustand": "^4.5.4"
+    "zustand": "^4.5.4",
+    "vite": "^5.4.19"
   },
   "devDependencies": {
     "@replit/vite-plugin-cartographer": "^0.2.7",
@@ -122,7 +123,7 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vite": "^5.4.19",
+    
     "vitest": "^1.6.0"
   },
   "optionalDependencies": {
