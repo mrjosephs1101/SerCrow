@@ -1,5 +1,5 @@
 // App.tsx
-import { Switch, Route } from "wouter";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,16 +17,16 @@ import SetupPage from "@/pages/setup";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Search} />
-      <Route path="/search" component={Search} />
-      <Route path="/sq/:searchId" component={Results} />
-      <Route path="/wingman" component={WingManPage} /> {/* 👈 Add route */}
-      <Route path="/browser" component={Browser} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/setup" component={SetupPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <Routes>
+      <Route path="/" element={<Search />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/sq/:searchId" element={<Results />} />
+      <Route path="/wingman" element={<WingManPage />} />
+      <Route path="/browser" element={<Browser />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/setup" element={<SetupPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
@@ -46,7 +46,9 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <Toaster />
-            <Router />
+            <HashRouter>
+              <Router />
+            </HashRouter>
           </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>
