@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* SerCrow brand colors */
+  --serqo-blue: hsl(217, 91%, 60%);
+  --serqo-blue-dark: hsl(217, 88%, 51%);
+  --serqo-blue-light: hsl(217, 92%, 76%);
+  --serqo-bird-shadow: hsl(217, 50%, 85%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  
+  /* SerCrow brand colors for dark mode */
+  --serqo-blue: hsl(217, 91%, 60%);
+  --serqo-blue-dark: hsl(217, 88%, 51%);
+  --serqo-blue-light: hsl(217, 92%, 76%);
+  --serqo-bird-shadow: hsl(217, 30%, 25%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .serqo-blue {
+    color: hsl(217, 91%, 60%);
+  }
+  
+  .bg-serqo-blue {
+    background-color: hsl(217, 91%, 60%);
+  }
+  
+  .border-serqo-blue {
+    border-color: hsl(217, 91%, 60%);
+  }
+  
+  .hover\:bg-serqo-blue-dark:hover {
+    background-color: hsl(217, 88%, 51%);
+  }
+  
+  .focus\:border-serqo-blue:focus {
+    border-color: hsl(217, 91%, 60%);
+  }
+  
+  .focus\:ring-serqo-blue:focus {
+    --tw-ring-color: hsl(217, 91%, 60%);
+  }
+  
+  .serqo-bird-glow {
+    filter: drop-shadow(0 0 10px var(--serqo-bird-shadow));
+  }
+  
+  .serqo-bird-hover:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 20px var(--serqo-bird-shadow));
+    transition: all 0.3s ease;
+  }
+  
+  .high-contrast {
+    filter: contrast(150%);
+  }
+  
+  .reduce-motion,
+  .reduce-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* ChatGPT-like styling for wingman */
+  .wingman-message {
+    transition: all 0.2s ease;
+  }
+  
+  .wingman-message:hover {
+    background-color: hsl(var(--muted) / 0.3);
+  }
+  
+  .wingman-input-area {
+    background: linear-gradient(to top, hsl(var(--background)), hsl(var(--background) / 0.95));
+  }
+  
+  .wingman-sidebar {
+    background: linear-gradient(to bottom, hsl(var(--muted) / 0.3), hsl(var(--muted) / 0.1));
+  }
+  
+  .wingman-chat-bubble {
+    animation: fadeInUp 0.3s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .wingman-typing {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Enhanced ChatGPT-like animations */
+  .wingman-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth sidebar transitions */
+  .wingman-sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Message bubble hover effects */
+  .wingman-message-bubble {
+    transition: all 0.2s ease;
+  }
+
+  .wingman-message-bubble:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--muted) / 0.4);
+  }
+
+  /* Input focus effects */
+  .wingman-input:focus {
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+    border-color: hsl(var(--primary));
+  }
+
+  /* Suggestion cards */
+  .wingman-suggestion-card {
+    transition: all 0.2s ease;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .wingman-suggestion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsl(var(--muted) / 0.5);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+}
