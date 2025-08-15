@@ -97,7 +97,8 @@
     "ws": "^8.18.0",
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0",
-    "zustand": "^4.5.4"
+  "zustand": "^4.5.4",
+  "autoprefixer": "^10.4.20"
   },
   "devDependencies": {
     "@replit/vite-plugin-cartographer": "^0.2.7",
@@ -116,7 +117,6 @@
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
     "@vitest/ui": "^1.6.0",
-    "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
     "drizzle-kit": "^0.30.4",
     "electron": "^36.5.0",
