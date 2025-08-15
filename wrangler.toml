@@ -16,3 +16,5 @@ NODE_ENV = "production"
 # VITE_AUTH0_DOMAIN = "your-auth0-domain"
 # VITE_AUTH0_CLIENT_ID = "your-auth0-client-id"
 # VITE_AUTH0_AUDIENCE = "your-auth0-audience"
+
+pages_build_output_dir = "dist"
