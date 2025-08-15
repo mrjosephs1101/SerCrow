@@ -15,7 +15,7 @@
     "electron:dev": "electron .",
   "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
   "predeploy": "vite build",
-  "deploy": "gh-pages -d dist/public"
+  "deploy": "main -d dist/public"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
