@@ -9,13 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./20250620_150619_1750447628914.png",
+      "src": "attached_assets/20250620_150619_1750447628914.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "./20250620_150619_1750447628914.png", 
+      "src": "attached_assets/20250620_150619_1750447628914.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
@@ -26,7 +26,7 @@
   "scope": ".",
   "screenshots": [
     {
-      "src": "./20250620_150619_1750447628914.png",
+      "src": "attached_assets/20250620_150619_1750447628914.png",
       "type": "image/png",
       "sizes": "540x720"
     }
