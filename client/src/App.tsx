@@ -17,7 +17,7 @@ import SetupPage from "@/pages/setup";
 
 function Router() {
   return (
-    <Switch base="/SerCrow/">
+    <Switch>
       <Route path="/" component={Search} />
       <Route path="/search" component={Search} />
       <Route path="/sq/:searchId" component={Results} />

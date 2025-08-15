@@ -5,8 +5,9 @@ let connecting = false;
 
 function getRedisConfigFromEnv() {
   const url = process.env.REDIS_URL;
+  const databaseId = process.env.REDIS_DATABASE_ID ? Number(process.env.REDIS_DATABASE_ID) : undefined;
   if (url) {
-    return { url } as any;
+    return { url, database: databaseId } as any;
   }
 
   const host = process.env.REDIS_HOST;
@@ -20,6 +21,7 @@ function getRedisConfigFromEnv() {
     socket: { host, port },
     username: username || undefined,
     password: password || undefined,
+    database: databaseId,
   } as any;
 }
 
@@ -39,7 +41,12 @@ export async function getRedis(): Promise<RedisClientType | null> {
     client = createClient(config);
     client.on('error', (err) => console.error('Redis Client Error', err));
     await client.connect();
-    console.log('🔌 Connected to Redis');
+    const dbName = process.env.REDIS_DATABASE_NAME;
+    if (dbName) {
+      console.log(`🔌 Connected to Redis (Database: ${dbName})`);
+    } else {
+      console.log('🔌 Connected to Redis');
+    }
     return client;
   } catch (e) {
     console.error('Failed to connect to Redis:', e);
