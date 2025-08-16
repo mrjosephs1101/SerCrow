@@ -1,4 +1,7 @@
+
 import type { SearchResponse, SearchSuggestion } from '@shared/schema';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
 export async function searchWeb(
   query: string, 
@@ -13,7 +16,7 @@ export async function searchWeb(
     limit: limit.toString(),
   });
 
-  const response = await fetch(`/api/search?${params}`, {
+  const response = await fetch(`${API_BASE}/api/search?${params}`, {
     credentials: 'include',
   });
 
@@ -27,7 +30,7 @@ export async function searchWeb(
 export async function getSearchSuggestions(query: string): Promise<{ suggestions: SearchSuggestion[] }> {
   const params = new URLSearchParams({ q: query });
   
-  const response = await fetch(`/api/suggestions?${params}`, {
+  const response = await fetch(`${API_BASE}/api/suggestions?${params}`, {
     credentials: 'include',
   });
 
@@ -39,7 +42,7 @@ export async function getSearchSuggestions(query: string): Promise<{ suggestions
 }
 
 export async function getPopularSearches() {
-  const response = await fetch('/api/popular-searches', {
+  const response = await fetch(`${API_BASE}/api/popular-searches`, {
     credentials: 'include',
   });
 
