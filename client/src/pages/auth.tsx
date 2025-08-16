@@ -36,9 +36,9 @@ export default function AuthPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Authentication failed');
       if (mode === 'register') {
-        setLocation('/setup');
+  setLocation('#/setup');
       } else {
-        setLocation('/');
+  setLocation('#/');
       }
     } catch (e: any) {
       setError(e.message || 'Authentication failed');

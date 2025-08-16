@@ -67,7 +67,7 @@ const handleSearch = (query: string) => {
       if (filter && filter !== 'all') newParams.set('filter', filter);
       newParams.set('page', '1');
       const searchId = `${q.toLowerCase().replace(/\s+/g, '-')}-${filter}`;
-      setLocation(`/sq/${searchId}?${newParams.toString()}`);
+  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
     }
   };
 
@@ -77,7 +77,7 @@ const handleSearch = (query: string) => {
     if (newFilter && newFilter !== 'all') newParams.set('filter', newFilter);
     newParams.set('page', '1');
     const searchId = `${searchQuery.toLowerCase().replace(/\s+/g, '-')}-${newFilter}`;
-    setLocation(`/sq/${searchId}?${newParams.toString()}`);
+  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -87,7 +87,7 @@ const handleSearch = (query: string) => {
     newParams.set('page', page.toString());
     
     const searchId = `${searchQuery.toLowerCase().replace(/\s+/g, '-')}-${filter}`;
-    setLocation(`/sq/${searchId}?${newParams.toString()}`);
+  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
     
     // Scroll to top when changing pages
     window.scrollTo({ top: 0, behavior: 'smooth' });

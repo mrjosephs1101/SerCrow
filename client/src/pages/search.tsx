@@ -22,7 +22,7 @@ const handleSearch = (query: string) => {
     if (query.trim()) {
       setSearchQuery(query);
       const searchId = query.trim().toLowerCase().replace(/\s+/g, '-') + '-all';
-      setLocation(`/sq/${searchId}?q=${encodeURIComponent(query.trim())}`);
+  setLocation(`#/sq/${searchId}?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -55,7 +55,7 @@ const handleSearch = (query: string) => {
   const handlePopularSearchClick = (query: string) => {
     setSearchQuery(query);
     const searchId = query.toLowerCase().replace(/\s+/g, '-') + '-all';
-    setLocation(`/sq/${searchId}?q=${encodeURIComponent(query)}`);
+  setLocation(`#/sq/${searchId}?q=${encodeURIComponent(query)}`);
   };
 
   // Set page title

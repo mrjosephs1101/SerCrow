@@ -20,10 +20,10 @@ export default function SetupPage() {
       const res = await fetch('/api/auth/require-setup');
       const data = await res.json();
       if (!data?.requireSetup) {
-        setLocation('/');
+  setLocation('#/');
       }
     } catch {
-      setLocation('/');
+  setLocation('#/');
     }
   })();
 
@@ -35,7 +35,7 @@ export default function SetupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ displayName, darkMode, safeSearch, newsBias })
       });
-      setLocation('/');
+  setLocation('#/');
     } finally {
       setSaving(false);
     }
