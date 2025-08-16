@@ -50,7 +50,7 @@ export default function SetupPage() {
           <div className="space-y-5">
             <div>
               <Label htmlFor="displayName">Display name</Label>
-              <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="What should we call you?" />
+              <Input id="displayName" name="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="What should we call you?" />
             </div>
             <div className="flex items-center justify-between">
               <div>

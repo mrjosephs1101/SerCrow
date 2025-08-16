@@ -33,23 +33,23 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="all-words">All these words</Label>
-          <Input id="all-words" value={allWords} onChange={(e) => setAllWords(e.target.value)} />
+          <Input id="all-words" name="all-words" value={allWords} onChange={(e) => setAllWords(e.target.value)} />
         </div>
         <div>
           <Label htmlFor="exact-phrase">This exact word or phrase</Label>
-          <Input id="exact-phrase" value={exactPhrase} onChange={(e) => setExactPhrase(e.target.value)} />
+          <Input id="exact-phrase" name="exact-phrase" value={exactPhrase} onChange={(e) => setExactPhrase(e.target.value)} />
         </div>
         <div>
           <Label htmlFor="any-words">Any of these words</Label>
-          <Input id="any-words" value={anyWords} onChange={(e) => setAnyWords(e.target.value)} />
+          <Input id="any-words" name="any-words" value={anyWords} onChange={(e) => setAnyWords(e.target.value)} />
         </div>
         <div>
           <Label htmlFor="none-words">None of these words</Label>
-          <Input id="none-words" value={noneWords} onChange={(e) => setNoneWords(e.target.value)} />
+          <Input id="none-words" name="none-words" value={noneWords} onChange={(e) => setNoneWords(e.target.value)} />
         </div>
         <div>
           <Label htmlFor="site">Site</Label>
-          <Input id="site" value={site} onChange={(e) => setSite(e.target.value)} placeholder="e.g., Google.com" />
+          <Input id="site" name="site" value={site} onChange={(e) => setSite(e.target.value)} placeholder="e.g., Google.com" />
         </div>
         <div>
           <Label htmlFor="file-type">File type</Label>
