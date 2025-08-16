@@ -19,3 +19,7 @@ NODE_ENV = "production"
 # VITE_AUTH0_AUDIENCE = "your-auth0-audience"
 
 pages_build_output_dir = "dist"
+
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = true
