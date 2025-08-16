@@ -100,9 +100,7 @@
   "zustand": "^4.5.4",
   "autoprefixer": "^10.4.20",
   "@tailwindcss/typography": "^0.5.15",
-  "esbuild": "^0.25.0",
-  "@rollup/rollup-linux-x64-gnu": "^4.20.0",
-    "@rollup/rollup-win32-x64-msvc": "^4.20.0"
+  "esbuild": "^0.25.0"
   },
   "devDependencies": {
     "@replit/vite-plugin-cartographer": "^0.2.7",
@@ -135,6 +133,8 @@
     "vitest": "^1.6.0"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.8"
+    "bufferutil": "^4.0.8",
+    "@rollup/rollup-linux-x64-gnu": "^4.20.0",
+    "@rollup/rollup-win32-x64-msvc": "^4.20.0"
   }
 }
