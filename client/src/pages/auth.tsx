@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Google, Github, Microsoft } from 'react-icons/fa';
+import { FaGoogle, FaGithub, FaMicrosoft } from 'react-icons/fa';
 
 // Base URL for API calls; set VITE_API_BASE_URL to your server origin for production
 const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || '';
