@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { SearchBar } from '@/components/search-bar';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePopularSearches } from '@/hooks/use-search';
-import serqoLogoPath from "@assets/20250620_150619_1750447628914.png";
 import { AdvancedSearch } from '@/components/advanced-search';
 
 export default function Search() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [dateRange, setDateRange] = useState('all');
@@ -22,7 +21,7 @@ const handleSearch = (query: string) => {
     if (query.trim()) {
       setSearchQuery(query);
       const searchId = query.trim().toLowerCase().replace(/\s+/g, '-') + '-all';
-  setLocation(`#/sq/${searchId}?q=${encodeURIComponent(query.trim())}`);
+      navigate(`/sq/${searchId}?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -55,7 +54,7 @@ const handleSearch = (query: string) => {
   const handlePopularSearchClick = (query: string) => {
     setSearchQuery(query);
     const searchId = query.toLowerCase().replace(/\s+/g, '-') + '-all';
-  setLocation(`#/sq/${searchId}?q=${encodeURIComponent(query)}`);
+    navigate(`/sq/${searchId}?q=${encodeURIComponent(query)}`);
   };
 
   // Set page title
@@ -82,7 +81,7 @@ const handleSearch = (query: string) => {
           {/* Logo */}
           <div className="flex items-center justify-center mb-6 sm:mb-8">
             <img 
-              src={serqoLogoPath} 
+              src="/feather.png" 
               alt="SerCrow" 
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
             />
