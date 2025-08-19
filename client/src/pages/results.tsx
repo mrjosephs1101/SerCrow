@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useSearch as useWouterSearch } from 'wouter';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { SearchResults } from '@/components/search-results';
@@ -13,8 +13,9 @@ import { Button } from '@/components/ui/button';
 import { WingManAssistant } from '@/components/wingman-assistant';
 
 export default function Results() {
-  const [location, setLocation] = useLocation();
-  const searchStr = useWouterSearch();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchStr = location.search;
   
   // Parse URL parameters in a router-aware way to ensure sync
   const params = new URLSearchParams(searchStr || '');
@@ -67,7 +68,7 @@ const handleSearch = (query: string) => {
       if (filter && filter !== 'all') newParams.set('filter', filter);
       newParams.set('page', '1');
       const searchId = `${q.toLowerCase().replace(/\s+/g, '-')}-${filter}`;
-  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
+      navigate(`/sq/${searchId}?${newParams.toString()}`);
     }
   };
 
@@ -77,7 +78,7 @@ const handleSearch = (query: string) => {
     if (newFilter && newFilter !== 'all') newParams.set('filter', newFilter);
     newParams.set('page', '1');
     const searchId = `${searchQuery.toLowerCase().replace(/\s+/g, '-')}-${newFilter}`;
-  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
+    navigate(`/sq/${searchId}?${newParams.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -87,7 +88,7 @@ const handleSearch = (query: string) => {
     newParams.set('page', page.toString());
     
     const searchId = `${searchQuery.toLowerCase().replace(/\s+/g, '-')}-${filter}`;
-  setLocation(`#/sq/${searchId}?${newParams.toString()}`);
+    navigate(`/sq/${searchId}?${newParams.toString()}`);
     
     // Scroll to top when changing pages
     window.scrollTo({ top: 0, behavior: 'smooth' });

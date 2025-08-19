@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { SearchResult } from '@shared/schema';
 import { ExternalLink, Clock, Tag, Share2, Image as ImageIcon, Video, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ export function SearchResults({
   filter,
   onFilterChange
 }: SearchResultsProps) {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
 
 
   const handleShare = async (result: SearchResult) => {

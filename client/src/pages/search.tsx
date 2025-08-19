@@ -81,7 +81,7 @@ const handleSearch = (query: string) => {
           {/* Logo */}
           <div className="flex items-center justify-center mb-6 sm:mb-8">
             <img 
-              src="/feather.png" 
+              src="/20250620_150619_1750447628914.png" 
               alt="SerCrow" 
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
             />

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 
 export default function SetupPage() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
   const [darkMode, setDarkMode] = useState(true);
   const [safeSearch, setSafeSearch] = useState(true);
@@ -15,17 +15,19 @@ export default function SetupPage() {
   const [saving, setSaving] = useState(false);
 
   // Guard: redirect if not required
-  (async () => {
-    try {
-      const res = await fetch('/api/auth/require-setup');
-      const data = await res.json();
-      if (!data?.requireSetup) {
-  setLocation('#/');
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/require-setup');
+        const data = await res.json();
+        if (!data?.requireSetup) {
+          navigate('/');
+        }
+      } catch {
+        navigate('/');
       }
-    } catch {
-  setLocation('#/');
-    }
-  })();
+    })();
+  }, [navigate]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -35,7 +37,7 @@ export default function SetupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ displayName, darkMode, safeSearch, newsBias })
       });
-  setLocation('#/');
+      navigate('/');
     } finally {
       setSaving(false);
     }

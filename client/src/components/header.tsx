@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { AccessibilitySettings } from '@/components/accessibility-settings';
 import serqoLogoPath from '@assets/20250620_150619_1750447628914.png';
@@ -24,7 +24,7 @@ export function Header({ compact = false }: HeaderProps) {
     <header className="border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity">
               <img 
                 src={serqoLogoPath} 
@@ -37,19 +37,19 @@ export function Header({ compact = false }: HeaderProps) {
           
           {!compact && (
             <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/results?filter=images">
+              <Link to="/results?filter=images">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">Images</span>
               </Link>
-              <Link href="/results?filter=news">
+              <Link to="/results?filter=news">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">News</span>
               </Link>
-              <Link href="/results?filter=shopping">
+              <Link to="/results?filter=shopping">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">Shopping</span>
               </Link>
-              <Link href="/wingman">
+              <Link to="/wingman">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">WingMan AI</span>
               </Link>
-              <Link href="/browser">
+              <Link to="/browser">
                 <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">Browser</span>
               </Link>
               <span className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors cursor-pointer">More</span>

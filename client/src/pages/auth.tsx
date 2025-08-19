@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { FaGoogle, FaGithub, FaMicrosoft } from 'react-icons/fa';
 const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || '';
 
 export default function AuthPage() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,9 +36,9 @@ export default function AuthPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Authentication failed');
       if (mode === 'register') {
-  setLocation('#/setup');
+  navigate('/setup');
       } else {
-  setLocation('#/');
+  navigate('/');
       }
     } catch (e: any) {
       setError(e.message || 'Authentication failed');

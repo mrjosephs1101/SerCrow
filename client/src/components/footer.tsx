@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Twitter, Facebook, Linkedin } from 'lucide-react';
 import serqoLogoPath from '@assets/20250620_150619_1750447628914.png';
 
@@ -25,22 +25,22 @@ export function Footer() {
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Search</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/search">
+                <Link to="/search">
                   <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Web Search</span>
                 </Link>
               </li>
               <li>
-                <Link href="/results?filter=images">
+                <Link to="/results?filter=images">
                   <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Image Search</span>
                 </Link>
               </li>
               <li>
-                <Link href="/results?filter=news">
+                <Link to="/results?filter=news">
                   <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">News Search</span>
                 </Link>
               </li>
               <li>
-                <Link href="/results?filter=videos">
+                <Link to="/results?filter=videos">
                   <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Video Search</span>
                 </Link>
               </li>
