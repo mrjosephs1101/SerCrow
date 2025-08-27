@@ -1,7 +1,52 @@
+import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { SearchResponse, SearchSuggestion } from '@shared/schema';
 
-export function useSearch(query: string, filter: string = 'all', page: number = 1) {
+interface SearchResult {
+  url: string;
+  title: string;
+  description?: string;
+  favicon?: string;
+  source?: string;
+}
+
+interface SearchResponse {
+  results: SearchResult[];
+  total?: number;
+}
+
+export function useSearch() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const search = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      setResults(data.results || []);
+      setQuery(searchQuery);
+    } catch (err) {
+      setError(err as Error);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return { results, isLoading, error, search, query };
+}
+
+export function useSearch2(query: string, filter: string = 'all', page: number = 1) {
   return useQuery<SearchResponse>({
     queryKey: ['/api/search', query, filter, page],
     queryFn: async () => {
@@ -32,19 +77,19 @@ export function useSearch(query: string, filter: string = 'all', page: number = 
 }
 
 export function useSearchSuggestions(query: string) {
-  return useQuery<{ suggestions: SearchSuggestion[] }>({
+  return useQuery<{ suggestions: { text: string }[] }>({
     queryKey: ['/api/suggestions', query],
     queryFn: async () => {
       const response = await fetch(`/api/suggestions?q=${encodeURIComponent(query)}`);
       if (!response.ok) {
-        throw new Error(`Suggestions failed: ${response.statusText}`);
+        return { suggestions: [] };
       }
 
       const data = await response.json();
       return data;
     },
     enabled: query.trim().length > 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 }
@@ -55,7 +100,7 @@ export function usePopularSearches() {
     queryFn: async () => {
       const response = await fetch(`/api/popular-searches`);
       if (!response.ok) {
-        throw new Error(`Popular searches failed: ${response.statusText}`);
+        return { searches: [] };
       }
 
       return response.json();
@@ -71,7 +116,7 @@ export function useRecentSearches() {
     queryFn: async () => {
       const response = await fetch(`/api/recent-searches`);
       if (!response.ok) {
-        throw new Error(`Recent searches failed: ${response.statusText}`);
+        return { searches: [] };
       }
 
       return response.json();

@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { SearchWithBrowser } from '@/components/SearchWithBrowser';
+import { EnhancedSearch } from '@/components/SearchWithBrowser';
 
 export default function Search() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function Search() {
 
   // For backward compatibility with old search URLs
   if (query) {
-    return <SearchWithBrowser />;
+    return <EnhancedSearch />;
   }
 
   return null;

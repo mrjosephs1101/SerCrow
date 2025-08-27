@@ -5,7 +5,7 @@ var __export = (target, all) => {
 };
 
 // server/index.ts
-import express2 from "express";
+import express from "express";
 
 // server/routes.ts
 import { createServer } from "http";
@@ -1247,124 +1247,18 @@ ${result.url}
   return httpServer;
 }
 
-// server/vite.ts
-import express from "express";
-import fs from "fs";
-import path2 from "path";
-import { createServer as createViteServer, createLogger } from "vite";
-
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-var getPlugins = async () => {
-  const plugins = [react()];
-  const isReplit = process.env.REPL_ID !== void 0;
-  if (isReplit) {
-    const runtimeErrorOverlay = await import("@replit/vite-plugin-runtime-error-modal");
-    const cartographer = await import("@replit/vite-plugin-cartographer");
-    plugins.push(runtimeErrorOverlay.default());
-    plugins.push(cartographer.cartographer());
-  }
-  return plugins;
-};
-var vite_config_default = defineConfig(async () => ({
-  plugins: await getPlugins(),
-  base: "/",
-  resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets")
-    }
-  },
-  root: path.resolve(import.meta.dirname, "client"),
-  build: {
-    outDir: path.resolve(import.meta.dirname, "dist"),
-    emptyOutDir: true
-  },
-  server: {
-    fs: {
-      strict: true,
-      deny: ["**/.*"]
-    },
-    hmr: {
-      overlay: false
-      // Disables Vite’s default error overlay
-    }
-  }
-}));
-
-// server/vite.ts
-import { nanoid } from "nanoid";
-var viteLogger = createLogger();
-async function setupVite(app2, server) {
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true
-  };
-  const resolvedConfig = typeof vite_config_default === "function" ? await vite_config_default() : vite_config_default;
-  const vite = await createViteServer({
-    ...resolvedConfig,
-    configFile: false,
-    customLogger: {
-      ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
-        process.exit(1);
-      }
-    },
-    server: { ...resolvedConfig?.server || {}, ...serverOptions },
-    appType: "custom"
-  });
-  app2.use(vite.middlewares);
-  app2.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-    try {
-      const clientTemplate = path2.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html"
-      );
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e);
-      next(e);
-    }
-  });
-}
-function serveStatic(app2) {
-  const distPath = path2.resolve(import.meta.dirname, "public");
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
-  }
-  app2.use(express.static(distPath));
-  app2.use("*", (_req, res) => {
-    res.sendFile(path2.resolve(distPath, "index.html"));
-  });
-}
-
 // server/index.ts
-import { createServer as createServer2 } from "http";
 import dotenv from "dotenv";
 import session from "express-session";
 import passport2 from "passport";
+import path from "path";
+import fs from "fs";
 import MemoryStoreFactory from "memorystore";
 dotenv.config();
-var app = express2();
+var app = express();
 app.set("trust proxy", 1);
-app.use(express2.json());
-app.use(express2.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 var FRONTEND_ORIGIN2 = process.env.FRONTEND_ORIGIN;
 var allowedOrigins = [FRONTEND_ORIGIN2, "http://localhost:5173", "http://127.0.0.1:5173"].filter(Boolean);
 app.use((req, res, next) => {
@@ -1404,7 +1298,7 @@ app.use(
 app.use(passport2.initialize());
 app.use((req, res, next) => {
   const start = Date.now();
-  const path3 = req.path;
+  const path2 = req.path;
   let capturedJsonResponse = void 0;
   const originalResJson = res.json;
   res.json = function(bodyJson, ...args) {
@@ -1413,8 +1307,8 @@ app.use((req, res, next) => {
   };
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path3.startsWith("/api")) {
-      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
+    if (path2.startsWith("/api")) {
+      let logLine = `${req.method} ${path2} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
@@ -1426,26 +1320,39 @@ app.use((req, res, next) => {
   });
   next();
 });
-(async () => {
-  registerRoutes(app);
-  const server = createServer2(app);
-  app.use((err, _req, res, _next) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
-  });
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
+registerRoutes(app);
+app.use((err, _req, res, _next) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(status).json({ message });
+  throw err;
+});
+var index_default = app;
+try {
+  const rootDir = process.cwd();
+  const distPath = path.join(rootDir, "dist");
+  console.log("Looking for dist directory at:", distPath);
+  if (fs.existsSync(distPath)) {
+    console.log("Found dist directory at:", distPath);
+    app.use(express.static(distPath));
+    app.use("/assets", express.static(path.join(distPath, "assets")));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+    console.log("Serving static files from", distPath);
   } else {
-    serveStatic(app);
+    console.warn("Dist directory not found at", distPath, ". Only API routes will be available.");
+    console.log("Current working directory:", process.cwd());
+    console.log("Directory contents:", fs.readdirSync(rootDir));
   }
-  const PORT = process.env.PORT || 5e3;
-  server.listen(PORT, "0.0.0.0", () => {
-    const formattedTime = new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "medium"
-    }).format(/* @__PURE__ */ new Date());
-    console.log(`${formattedTime} [express] serving on port ${PORT}`);
-  });
-})();
+} catch (error) {
+  console.error("Error setting up static file serving:", error);
+}
+var PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+  console.log(`Open http://localhost:${PORT} in your browser`);
+});
+export {
+  index_default as default
+};

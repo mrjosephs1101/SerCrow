@@ -38,6 +38,7 @@ export default defineConfig(async () => ({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    assetsDir: 'assets',
   },
 
   server: {

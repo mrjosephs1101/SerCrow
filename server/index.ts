@@ -3,6 +3,8 @@ import { registerRoutes } from "./routes";
 import dotenv from "dotenv";
 import session from "express-session";
 import passport from "passport";
+import path from "path";
+import fs from "fs";
 // @ts-ignore - memorystore has no types
 import MemoryStoreFactory from "memorystore";
 
@@ -98,8 +100,70 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 export default app;
 
+// Serve static files from the dist directory
+try {
+  // Get the correct path for the dist directory
+  const rootDir = process.cwd();
+  const distPath = path.join(rootDir, 'dist');
+  
+  console.log('Looking for dist directory at:', distPath);
+  
+  if (fs.existsSync(distPath)) {
+    console.log('Found dist directory at:', distPath);
+    
+    // Serve static files from dist directory with proper caching headers
+    app.use(express.static(distPath, {
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, path) => {
+        // Cache static assets for 1 year
+        if (express.static.mime.lookup(path) !== 'text/html') {
+          res.setHeader('Cache-Control', 'public, max-age=31536000');
+        } else {
+          // Don't cache HTML files
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+        }
+      }
+    }));
+    
+    // Also serve assets from /assets path
+    app.use('/assets', express.static(path.join(distPath, 'assets'), {
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, path) => {
+        res.set('Cache-Control', 'public, max-age=31536000');
+        res.set('Access-Control-Allow-Origin', '*');
+      }
+    }));
+    
+    // Handle SPA routing - return index.html for all other routes
+    app.get('*', (req, res) => {
+      // If the request is for an asset that doesn't exist, return 404
+      if (req.path.startsWith('/assets/')) {
+        const assetPath = path.join(distPath, req.path);
+        if (!fs.existsSync(assetPath)) {
+          return res.status(404).send('Asset not found');
+        }
+      }
+      // Otherwise, serve index.html for SPA routing
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+    
+    console.log('Serving static files from', distPath);
+  } else {
+    console.warn('Dist directory not found at', distPath, '. Only API routes will be available.');
+    console.log('Current working directory:', process.cwd());
+    console.log('Directory contents:', fs.readdirSync(rootDir));
+  }
+} catch (error) {
+  console.error('Error setting up static file serving:', error);
+}
+
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
+  console.log(`Open http://localhost:${PORT} in your browser`);
 });

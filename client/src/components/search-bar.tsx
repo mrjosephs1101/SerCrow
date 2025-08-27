@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Mic, MicOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSearchSuggestions } from '@/hooks/use-search';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -27,6 +28,8 @@ export function SearchBar({
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +44,40 @@ export function SearchBar({
       setShowSuggestions(false);
     }
   }, [debouncedQuery, suggestions, isFocused]);
+
+  const handleVoiceSearch = async () => {
+    if (isRecording) {
+      mediaRecorder?.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+      recorder.start();
+      setIsRecording(true);
+
+      recorder.addEventListener('dataavailable', async (event) => {
+        const audioBlob = new Blob([event.data], { type: 'audio/webm' });
+        const response = await fetch('https://api.deepgram.com/v1/listen', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'audio/webm',
+            'Authorization': `Token ${process.env.DEEPGRAM_STT_API}`
+          },
+          body: audioBlob
+        });
+        const data = await response.json();
+        const transcript = data.results.channels[0].alternatives[0].transcript;
+        onChange(transcript);
+        onSearch(transcript);
+      });
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -115,7 +152,7 @@ export function SearchBar({
             onBlur={handleInputBlur}
             placeholder={placeholder}
             className={cn(
-              "w-full pl-12 pr-4 transition-all duration-200",
+              "w-full pl-12 pr-12 transition-all duration-200",
               "border border-gray-300 dark:border-gray-600",
               "focus:border-blue-500 dark:focus:border-blue-400",
               "focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400",
@@ -125,6 +162,15 @@ export function SearchBar({
               className
             )}
           />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-4"
+            onClick={handleVoiceSearch}
+          >
+            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
         </div>
       </form>
 

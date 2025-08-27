@@ -7,19 +7,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Auth0Provider } from '@auth0/auth0-react';
 import { ThemeProvider } from "@/components/theme-provider";
 
-import Search from "@/pages/search";
+import Search from "./pages/search";
 import Results from "@/pages/results";
 import NotFound from "@/pages/not-found";
-import WingManPage from "@/pages/wingman"; // 👈 Add this
+import WingManPage from "@/pages/wingman";
 import Browser from "@/pages/browser";
 import AuthPage from "@/pages/auth";
 import SetupPage from "@/pages/setup";
+import { SearchWithBrowser } from "@/components/SearchWithBrowser";
+import { EnhancedBrowser } from "@/components/EnhancedBrowser";
 
 function Router() {
   return (
     <Routes>
-      <Route path="/" element={<Search />} />
-      <Route path="/search" element={<Search />} />
+      <Route path="/" element={<EnhancedBrowser />} />
+      <Route path="/search" element={<EnhancedBrowser />} />
+      <Route path="/classic" element={<Search />} />
       <Route path="/sq/:searchId" element={<Results />} />
       <Route path="/wingman" element={<WingManPage />} />
       <Route path="/browser" element={<Browser />} />
