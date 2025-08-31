@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, BrowserView, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, BrowserView, ipcMain, shell, session } = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -7,28 +7,47 @@ let browserView;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    icon: path.join(__dirname, 'client/public/favicon.png'),
+    width: 1400,
+    height: 900,
+    minWidth: 1000,
+    minHeight: 700,
+    icon: path.join(__dirname, 'client/public/SerCrow logo.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
       webSecurity: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false
     },
-    titleBarStyle: 'default',
-    show: false
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+    show: false,
+    backgroundColor: '#ffffff',
+    title: 'SerCrow - Private Search Engine'
+  });
+
+  // Set up privacy-focused session
+  const ses = session.defaultSession;
+  
+  // Block ads and trackers
+  ses.webRequest.onBeforeRequest({ urls: ['*://*/*'] }, (details, callback) => {
+    const url = details.url.toLowerCase();
+    const blockedDomains = [
+      'doubleclick.net', 'googleadservices.com', 'googlesyndication.com',
+      'facebook.com/tr', 'google-analytics.com', 'googletagmanager.com',
+      'scorecardresearch.com', 'outbrain.com', 'taboola.com'
+    ];
+    
+    const shouldBlock = blockedDomains.some(domain => url.includes(domain));
+    callback({ cancel: shouldBlock });
   });
 
   // Load the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5000');
-    mainWindow.webContents.openDevTools();
+    mainWindow.loadURL('http://localhost:5173');
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'client/dist/index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'));
   }
 
   mainWindow.once('ready-to-show', () => {
@@ -44,12 +63,20 @@ function createWindow() {
     browserView = null;
   });
 
-  // Create and attach BrowserView
-  browserView = new BrowserView();
-  mainWindow.setBrowserView(browserView);
-  browserView.setBounds({ x: 0, y: 70, width: 1200, height: 730 });
+  // Create and attach BrowserView for integrated browsing
+  browserView = new BrowserView({
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false
+    }
+  });
+  
+  // Initially hide the browser view
+  browserView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
   browserView.setAutoResize({ width: true, height: true });
-  browserView.webContents.loadURL('https://www.google.com');
 
   // Set up menu
   const template = [
@@ -121,30 +148,45 @@ app.on('web-contents-created', (event, contents) => {
   });
 });
 
-// IPC handlers
+// Enhanced IPC handlers
 ipcMain.on('toMain', (event, data) => {
-  if (!browserView) return;
-
   switch (data.type) {
     case 'navigate':
+      if (!browserView) return;
       let url = data.url;
-      if (!url.startsWith('http')) {
-        url = 'https://' + url;
+      
+      // Smart URL handling
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        if (url.includes('.') && !url.includes(' ')) {
+          url = 'https://' + url;
+        } else {
+          url = `https://duckduckgo.com/?q=${encodeURIComponent(url)}`;
+        }
       }
+      
+      mainWindow.setBrowserView(browserView);
+      const bounds = mainWindow.getBounds();
+      browserView.setBounds({ x: 0, y: 140, width: bounds.width, height: bounds.height - 140 });
+      
       browserView.webContents.loadURL(url);
       break;
+      
     case 'goBack':
-      if (browserView.webContents.canGoBack()) {
+      if (browserView && browserView.webContents.canGoBack()) {
         browserView.webContents.goBack();
       }
       break;
+      
     case 'goForward':
-      if (browserView.webContents.canGoForward()) {
+      if (browserView && browserView.webContents.canGoForward()) {
         browserView.webContents.goForward();
       }
       break;
+      
     case 'reload':
-      browserView.webContents.reload();
+      if (browserView) {
+        browserView.webContents.reload();
+      }
       break;
   }
 });

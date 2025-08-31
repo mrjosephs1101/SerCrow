@@ -5,14 +5,21 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx -r dotenv/config server/index.ts",
+    "dev:client": "vite",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build:client": "vite build",
     "build:cloudflare": "vite build && esbuild server/index.ts --platform=neutral --packages=external --bundle --format=esm --outdir=dist --target=es2022",
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "electron:dev": "electron .",
+    "electron:dev": "concurrently \"npm run dev:client\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "npm run build:client && electron-builder",
+    "electron:dist": "npm run build:client && electron-builder --publish=never",
+    "mobile:dev": "npm run build:client && npx cap sync && npx cap run android",
+    "mobile:build": "npm run build:client && npx cap sync && npx cap build android",
+    "mobile:sync": "npx cap sync",
     "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist"
@@ -118,6 +125,7 @@
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
     "@vitest/ui": "^1.6.0",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "drizzle-kit": "^0.30.4",
     "electron": "^36.5.0",
@@ -128,11 +136,37 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "wait-on": "^8.0.1"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.20.0",
     "@rollup/rollup-win32-x64-msvc": "^4.20.0",
     "bufferutil": "^4.0.8"
+  },
+  "build": {
+    "appId": "com.sercrow.searchengine",
+    "productName": "SerCrow",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron.js",
+      "preload.js",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "client/public/SerCrow logo.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "client/public/SerCrow logo.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "client/public/SerCrow logo.png"
+    }
   }
 }

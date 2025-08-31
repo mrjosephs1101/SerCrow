@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ArrowRight, RotateCw, X, Search } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ArrowRight, RotateCw, X, Search, Shield, Lock, Eye, EyeOff } from 'lucide-react';
 
 export interface BrowserControlsProps {
   url: string;
@@ -15,6 +16,10 @@ export interface BrowserControlsProps {
   onSearch?: (query: string) => void;
   showSearchButton?: boolean;
   className?: string;
+  privacyMode?: boolean;
+  onTogglePrivacy?: () => void;
+  trackersBlocked?: number;
+  isSecure?: boolean;
 }
 
 export function BrowserControls({
@@ -29,6 +34,10 @@ export function BrowserControls({
   onSearch,
   showSearchButton = false,
   className = '',
+  privacyMode = true,
+  onTogglePrivacy,
+  trackersBlocked = 0,
+  isSecure = false,
 }: BrowserControlsProps) {
   const [inputUrl, setInputUrl] = useState(url);
   const [isFocused, setIsFocused] = useState(false);
@@ -80,6 +89,9 @@ export function BrowserControls({
     inputRef.current?.focus();
   };
 
+  // Check if URL is secure
+  const urlIsSecure = url.startsWith('https://') || isSecure;
+  
   return (
     <div className={`flex items-center gap-2 p-2 bg-background border-b ${className}`}>
       <Button 
@@ -112,7 +124,20 @@ export function BrowserControls({
       </Button>
       
       <div className="relative flex-1 flex items-center">
-        <div className="relative flex-1">
+        <div className="relative flex-1 flex items-center">
+          {/* Security indicator */}
+          {url !== 'about:blank' && (
+            <div className="absolute left-3 z-10 flex items-center">
+              {urlIsSecure ? (
+                <Lock className="h-4 w-4 text-green-600" />
+              ) : (
+                <div className="h-4 w-4 rounded-full bg-orange-500 flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
+                </div>
+              )}
+            </div>
+          )}
+          
           <Input
             ref={inputRef}
             value={inputUrl}
@@ -121,7 +146,7 @@ export function BrowserControls({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder="Search or enter website address"
-            className={`pr-10 ${isFocused ? 'bg-background' : 'bg-muted/50'}`}
+            className={`${url !== 'about:blank' ? 'pl-10' : ''} pr-10 ${isFocused ? 'bg-background' : 'bg-muted/50'}`}
             aria-label="Address bar"
           />
           
@@ -148,6 +173,28 @@ export function BrowserControls({
           >
             <Search className="h-4 w-4 mr-2" />
             Search
+          </Button>
+        )}
+      </div>
+      
+      {/* Privacy controls */}
+      <div className="flex items-center gap-2">
+        {privacyMode && trackersBlocked > 0 && (
+          <Badge variant="secondary" className="text-xs">
+            <Shield className="h-3 w-3 mr-1" />
+            {trackersBlocked}
+          </Badge>
+        )}
+        
+        {onTogglePrivacy && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onTogglePrivacy}
+            aria-label={`Privacy mode ${privacyMode ? 'on' : 'off'}`}
+            className={privacyMode ? 'text-green-600' : 'text-muted-foreground'}
+          >
+            {privacyMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </Button>
         )}
       </div>

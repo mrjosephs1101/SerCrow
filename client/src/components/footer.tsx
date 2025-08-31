@@ -1,88 +1,26 @@
-import { Link } from 'react-router-dom';
-import { Twitter, Facebook, Linkedin } from 'lucide-react';
-import serqoLogoPath from '@assets/20250620_150619_1750447628914.png';
+import React from 'react';
 
 export function Footer() {
   return (
-    <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <img 
-                src={serqoLogoPath} 
-                alt="SerCrow Bird Logo Footer" 
-                className="w-8 h-8 object-contain drop-shadow-sm"
-              />
-              <span className="text-lg font-bold serqo-blue">SerCrow</span>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              The best search engine ever, delivering fast, accurate, and relevant results for all your queries.
-            </p>
+    <footer className="bg-gray-100 border-t mt-auto">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-wrap justify-center md:justify-start space-x-6 text-sm text-gray-600">
+            <a href="#" className="hover:underline">About</a>
+            <a href="#" className="hover:underline">Advertising</a>
+            <a href="#" className="hover:underline">Business</a>
+            <a href="#" className="hover:underline">How Search works</a>
           </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Search</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/search">
-                  <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Web Search</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/results?filter=images">
-                  <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Image Search</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/results?filter=news">
-                  <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">News Search</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/results?filter=videos">
-                  <span className="text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">Video Search</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Company</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Careers</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Press</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a></li>
-            </ul>
+          
+          <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm text-gray-600">
+            <a href="#" className="hover:underline">Privacy</a>
+            <a href="#" className="hover:underline">Terms</a>
+            <a href="#" className="hover:underline">Settings</a>
           </div>
         </div>
-
-        <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
-            © 2025 SerCrow. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-              <Facebook className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
-              <Linkedin className="h-5 w-5" />
-            </a>
-          </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
+          © 2024 SerCrow - The Best Search Engine Ever
         </div>
       </div>
     </footer>

@@ -1,5 +1,6 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -8,89 +9,74 @@ interface PaginationProps {
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  // Generate page numbers to display
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 7;
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      // Always include first page
-      pages.push(1);
-      
-      if (currentPage <= 4) {
-        // Near the beginning
-        for (let i = 2; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        // Near the end
-        pages.push('...');
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        // In the middle
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
-      }
+  const getVisiblePages = () => {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+
+    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+      range.push(i);
     }
-    
-    return pages;
+
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, '...');
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    rangeWithDots.push(...range);
+
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push('...', totalPages);
+    } else if (totalPages > 1) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
   };
 
-  const pageNumbers = getPageNumbers();
+  if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center space-x-2 py-12">
+    <div className="flex items-center justify-center space-x-2 py-8">
       <Button
-        variant="ghost"
-        size="icon"
-        className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-        disabled={currentPage <= 1}
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage <= 1}
+        className="flex items-center gap-1"
       >
         <ChevronLeft className="h-4 w-4" />
+        Previous
       </Button>
-      
+
       <div className="flex items-center space-x-1">
-        {pageNumbers.map((page, index) => (
-          page === '...' ? (
-            <span key={`ellipsis-${index}`} className="px-2 text-gray-400">...</span>
-          ) : (
-            <Button
-              key={page}
-              variant={currentPage === page ? "default" : "ghost"}
-              size="icon"
-              className={`w-12 h-12 rounded-full font-medium transition-colors ${
-                currentPage === page
-                  ? 'bg-serqo-blue hover:bg-serqo-blue-dark text-white'
-                  : 'hover:bg-gray-100 text-gray-700'
-              }`}
-              onClick={() => onPageChange(page as number)}
-            >
-              {page}
-            </Button>
-          )
+        {getVisiblePages().map((page, index) => (
+          <React.Fragment key={index}>
+            {page === '...' ? (
+              <span className="px-3 py-2 text-gray-500">...</span>
+            ) : (
+              <Button
+                variant={currentPage === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => onPageChange(page as number)}
+                className="min-w-[40px]"
+              >
+                {page}
+              </Button>
+            )}
+          </React.Fragment>
         ))}
       </div>
-      
+
       <Button
-        variant="ghost"
-        size="icon"
-        className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-        disabled={currentPage >= totalPages}
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="flex items-center gap-1"
       >
+        Next
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>

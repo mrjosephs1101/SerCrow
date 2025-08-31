@@ -69,10 +69,6 @@ export function EnhancedBrowser({ initialQuery = '', initialUrl = '' }: Enhanced
           >
             {privacyMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </Button>
-
-          <Button variant="ghost" size="icon">
-            <Settings className="h-4 w-4" />
-          </Button>
         </div>
       </div>
 

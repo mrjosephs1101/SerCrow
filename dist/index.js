@@ -1334,9 +1334,34 @@ try {
   console.log("Looking for dist directory at:", distPath);
   if (fs.existsSync(distPath)) {
     console.log("Found dist directory at:", distPath);
-    app.use(express.static(distPath));
-    app.use("/assets", express.static(path.join(distPath, "assets")));
+    app.use(express.static(distPath, {
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, path2) => {
+        if (express.static.mime.lookup(path2) !== "text/html") {
+          res.setHeader("Cache-Control", "public, max-age=31536000");
+        } else {
+          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+          res.setHeader("Pragma", "no-cache");
+          res.setHeader("Expires", "0");
+        }
+      }
+    }));
+    app.use("/assets", express.static(path.join(distPath, "assets"), {
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, path2) => {
+        res.set("Cache-Control", "public, max-age=31536000");
+        res.set("Access-Control-Allow-Origin", "*");
+      }
+    }));
     app.get("*", (req, res) => {
+      if (req.path.startsWith("/assets/")) {
+        const assetPath = path.join(distPath, req.path);
+        if (!fs.existsSync(assetPath)) {
+          return res.status(404).send("Asset not found");
+        }
+      }
       res.sendFile(path.join(distPath, "index.html"));
     });
     console.log("Serving static files from", distPath);

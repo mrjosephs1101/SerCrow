@@ -14,6 +14,7 @@ export interface BrowserViewProps {
   onLoadStart?: () => void;
   onLoadEnd?: () => void;
   onError?: (error: Error) => void;
+  onSearch?: (query: string) => void;
 }
 
 export function BrowserView({
@@ -23,6 +24,7 @@ export function BrowserView({
   onLoadStart,
   onLoadEnd,
   onError,
+  onSearch,
 }: BrowserViewProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
@@ -168,6 +170,8 @@ export function BrowserView({
         canGoBack={canGoBack}
         canGoForward={canGoForward}
         isLoading={isLoading}
+        onSearch={onSearch}
+        isSecure={currentUrl.startsWith('https://')}
       />
       
       <div className="flex-1 relative">

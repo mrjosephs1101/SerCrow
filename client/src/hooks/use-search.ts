@@ -14,40 +14,10 @@ interface SearchResponse {
   total?: number;
 }
 
-export function useSearch() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
-  const search = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!response.ok) {
-        throw new Error(`Search failed: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setResults(data.results || []);
-      setQuery(searchQuery);
-    } catch (err) {
-      setError(err as Error);
-      setResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
-  return { results, isLoading, error, search, query };
-}
-
-export function useSearch2(query: string, filter: string = 'all', page: number = 1) {
-  return useQuery<SearchResponse>({
+export function useSearch(query: string, filter: string = 'all', page: number = 1) {
+  return useQuery({
     queryKey: ['/api/search', query, filter, page],
     queryFn: async () => {
       const params = new URLSearchParams({

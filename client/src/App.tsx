@@ -1,63 +1,64 @@
-// App.tsx
-import { HashRouter, Routes, Route } from "react-router-dom";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Auth0Provider } from '@auth0/auth0-react';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-import Search from "./pages/search";
+// Import pages
+import Search from "@/pages/search";
 import Results from "@/pages/results";
+import Auth from "@/pages/auth";
+import Setup from "@/pages/setup";
 import NotFound from "@/pages/not-found";
-import WingManPage from "@/pages/wingman";
 import Browser from "@/pages/browser";
-import AuthPage from "@/pages/auth";
-import SetupPage from "@/pages/setup";
-import { SearchWithBrowser } from "@/components/SearchWithBrowser";
-import { EnhancedBrowser } from "@/components/EnhancedBrowser";
+import EnhancedBrowser from "@/pages/enhanced-browser";
+import Wingman from "@/pages/wingman";
 
-function Router() {
+// Import mobile components
+import { MobileBrowser } from "@/components/MobileBrowser";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
+function AppContent() {
+  const isMobile = useIsMobile();
+  
   return (
-    <Routes>
-      <Route path="/" element={<EnhancedBrowser />} />
-      <Route path="/search" element={<EnhancedBrowser />} />
-      <Route path="/classic" element={<Search />} />
-      <Route path="/sq/:searchId" element={<Results />} />
-      <Route path="/wingman" element={<WingManPage />} />
-      <Route path="/browser" element={<Browser />} />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/setup" element={<SetupPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <div className="min-h-screen bg-background">
+      <Routes>
+        <Route path="/" element={<Navigate to="/search" replace />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/results" element={<Results />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/setup" element={<Setup />} />
+        <Route path="/browser" element={<Browser />} />
+        <Route path="/enhanced-browser" element={<EnhancedBrowser />} />
+        <Route path="/wingman" element={<Wingman />} />
+        <Route path="/mobile-browser" element={<MobileBrowser />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   );
 }
 
 function App() {
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-
   return (
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: window.location.origin
-      }}
-    >
-      <ThemeProvider defaultTheme="system" storageKey="serqo-ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <HashRouter>
-              <Router />
-            </HashRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light" storageKey="sercrow-ui-theme">
+        <Router>
+          <AppContent />
+          <Toaster />
+        </Router>
       </ThemeProvider>
-    </Auth0Provider>
+    </QueryClientProvider>
   );
 }
 
 export default App;
-
