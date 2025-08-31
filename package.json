@@ -21,7 +21,7 @@
     "mobile:dev": "npm run build:client && npx cap sync && npx cap run android",
     "mobile:build": "npm run build:client && npx cap sync && npx cap build android",
     "mobile:sync": "npx cap sync",
-    "deploy:cloudflare": "npm run build:client && wrangler pages deploy dist",
+    "deploy:cloudflare": "npm run build:client && npx wrangler pages deploy dist",
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist"
   },
