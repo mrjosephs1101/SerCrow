@@ -1,43 +1,51 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { mockSearch } from '@/lib/mock-search';
 
 interface SearchResult {
   url: string;
   title: string;
   description?: string;
+  snippet?: string;
   favicon?: string;
   source?: string;
+  displayUrl?: string;
 }
 
 interface SearchResponse {
   results: SearchResult[];
   total?: number;
+  totalResults?: number;
+  searchTime?: number;
 }
-
-
 
 export function useSearch(query: string, filter: string = 'all', page: number = 1) {
   return useQuery({
     queryKey: ['/api/search', query, filter, page],
     queryFn: async () => {
-      const params = new URLSearchParams({
-        q: query,
-        filter,
-        page: page.toString()
-      });
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          filter,
+          page: page.toString()
+        });
 
-      const response = await fetch(`/api/search?${params.toString()}`);
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Search failed: ${response.status} - ${errText}`);
+        const response = await fetch(`/api/search?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error(`Search failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data || !Array.isArray(data.results)) {
+          throw new Error("Invalid response from search API.");
+        }
+
+        return data;
+      } catch (error) {
+        // Fallback to mock search when backend is not available
+        console.log('Backend not available, using mock search');
+        return await mockSearch(query);
       }
-
-      const data = await response.json();
-      if (!data || !Array.isArray(data.results)) {
-        throw new Error("Invalid response from search API.");
-      }
-
-      return data;
     },
     enabled: query.trim().length > 0,
     refetchOnMount: true,

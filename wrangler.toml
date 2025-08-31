@@ -1,25 +1,14 @@
 name = "sercrow"
-main = "dist/index.js"
-compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2024-09-23"
+node_compat = true
+
+# Cloudflare Pages configuration
+pages_build_output_dir = "dist"
 
 [env.production]
-name = "sercrow-api"
+name = "sercrow-frontend"
 
 [vars]
 NODE_ENV = "production"
-
-# Add your environment variables here
-# GOOGLE_SEARCH_API_KEY = "your-api-key"
-# GOOGLE_SEARCH_ENGINE_ID = "your-engine-id"
-# DATABASE_URL = "your-database-url"
-# SESSION_SECRET = "your-session-secret"
-# VITE_AUTH0_DOMAIN = "your-auth0-domain"
-# VITE_AUTH0_CLIENT_ID = "your-auth0-client-id"
-# VITE_AUTH0_AUDIENCE = "your-auth0-audience"
-
-pages_build_output_dir = "dist"
-
-# wrangler.toml (wrangler v3.88.0^)
-[observability.logs]
-enabled = true
+VITE_APP_NAME = "SerCrow"
+VITE_APP_DESCRIPTION = "Private Search Engine with Built-in Browser"

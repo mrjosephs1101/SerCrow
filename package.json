@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx -r dotenv/config server/index.ts",
     "dev:client": "vite",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "vite build",
     "build:client": "vite build",
-    "build:cloudflare": "vite build && esbuild server/index.ts --platform=neutral --packages=external --bundle --format=esm --outdir=dist --target=es2022",
+    "build:server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build:full": "vite build && npm run build:server",
     "start": "cross-env NODE_ENV=production node -r dotenv/config dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
@@ -20,7 +21,7 @@
     "mobile:dev": "npm run build:client && npx cap sync && npx cap run android",
     "mobile:build": "npm run build:client && npx cap sync && npx cap build android",
     "mobile:sync": "npx cap sync",
-    "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
+    "deploy:cloudflare": "npm run build:client && wrangler pages deploy dist",
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist"
   },
