@@ -14,6 +14,7 @@ import NotFound from "@/pages/not-found";
 import Browser from "@/pages/browser";
 import EnhancedBrowser from "@/pages/enhanced-browser";
 import Wingman from "@/pages/wingman";
+import DownloadPage from "@/pages/download";
 
 // Import mobile components
 import { MobileBrowser } from "@/components/MobileBrowser";
@@ -41,6 +42,7 @@ function AppContent() {
         <Route path="/browser" element={<Browser />} />
         <Route path="/enhanced-browser" element={<EnhancedBrowser />} />
         <Route path="/wingman" element={<Wingman />} />
+        <Route path="/download" element={<DownloadPage />} />
         <Route path="/mobile-browser" element={<MobileBrowser />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -7,6 +7,7 @@
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
+  "permissions": ["microphone"],
   "icons": [
     {
       "src": "./20250620_150619_1750447628914.png",

@@ -22,6 +22,7 @@ export function Header({ compact = false }: HeaderProps) {
         </div>
         
         <div className="flex items-center space-x-4 text-sm">
+          <a href="/download" className="text-gray-700 hover:underline">Download</a>
           <a href="#" className="text-gray-700 hover:underline">Gmail</a>
           <a href="#" className="text-gray-700 hover:underline">Images</a>
           <Button

@@ -1,0 +1,21 @@
+directories:
+  output: dist-electron
+  buildResources: build
+appId: com.sercrow.searchengine
+productName: SerCrow
+files:
+  - filter:
+      - dist/**/*
+      - electron.js
+      - preload.js
+      - package.json
+mac:
+  category: public.app-category.productivity
+  icon: client/public/SerCrow logo.png
+win:
+  target: nsis
+  icon: client/public/SerCrow logo.png
+linux:
+  target: AppImage
+  icon: client/public/SerCrow logo.png
+electronVersion: 36.8.0

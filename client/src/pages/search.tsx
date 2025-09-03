@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DuckDuckGoBrowser } from '@/components/DuckDuckGoBrowser';
-import { Search as SearchIcon, Mic, Settings, Globe } from 'lucide-react';
+import { Search as SearchIcon, Settings, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { SearchBar } from '@/components/search-bar';
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -99,22 +99,16 @@ export default function Search() {
 
         {/* Search Box */}
         <div className="w-full max-w-xl mb-8">
-          <form onSubmit={handleSearch}>
-            <div className="relative">
-              <div className="flex items-center border-2 border-gray-300 rounded-full px-4 py-3 hover:shadow-lg focus-within:shadow-lg focus-within:border-orange-500 transition-all">
-                <SearchIcon className="h-5 w-5 text-gray-400 mr-3" />
-                <Input
-                  type="text"
-                  placeholder="Search the web without being tracked..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="flex-1 border-none outline-none text-base bg-transparent focus:ring-0"
-                  autoFocus
-                />
-                <Mic className="h-5 w-5 text-gray-400 ml-3 cursor-pointer hover:text-orange-500 transition-colors" />
-              </div>
-            </div>
-          </form>
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onSearch={(q) => {
+              setQuery(q);
+              handleSearch();
+            }}
+            placeholder="Search the web without being tracked..."
+            className="w-full"
+          />
         </div>
 
         {/* Search Buttons */}
